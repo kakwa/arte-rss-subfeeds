@@ -19,7 +19,7 @@ const feedURLTemplate = "https://www.arte.tv/partnerFeeds/rss/schedule/today/%s.
 
 func main() {
 	dbPath := flag.String("db-path", getEnv("DB_PATH", "arte.db"), "path to the sqlite database file")
-	port := flag.Int("port", getEnvInt("PORT", 8080), "port to listen on")
+	listen := flag.String("listen", getEnv("LISTEN", "127.0.0.1:8080"), "address to listen on, e.g. 127.0.0.1:8080")
 	logLevel := flag.String("log-level", getEnv("LOG_LEVEL", "info"), "log level: debug, info, warn, error")
 	flag.Parse()
 
@@ -30,7 +30,7 @@ func main() {
 	}
 	defer logger.Sync()
 
-	addr := fmt.Sprintf(":%d", *port)
+	addr := *listen
 	interval := getEnvDuration(logger, "FETCH_INTERVAL", 4*time.Hour)
 	feedURLs := map[string]string{
 		"fr": getEnv("FR_FEED_URL", fmt.Sprintf(feedURLTemplate, "fr")),
@@ -116,16 +116,6 @@ func fetchOnce(logger *zap.Logger, db *sql.DB, feedURL, lang string) {
 func getEnv(key, fallback string) string {
 	if v := os.Getenv(key); v != "" {
 		return v
-	}
-	return fallback
-}
-
-func getEnvInt(key string, fallback int) int {
-	if v := os.Getenv(key); v != "" {
-		var i int
-		if _, err := fmt.Sscanf(v, "%d", &i); err == nil {
-			return i
-		}
 	}
 	return fallback
 }

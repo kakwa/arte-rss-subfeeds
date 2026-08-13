@@ -8,7 +8,7 @@ Type=simple
 User=arte-rss-subfeeds
 Group=arte-rss-subfeeds
 WorkingDirectory=/var/lib/arte-rss-subfeeds
-ExecStart=/usr/local/bin/arte-rss-subfeeds --db-path /var/lib/arte-rss-subfeeds/arte.db --port 8080 --log-level info
+ExecStart=/usr/local/bin/arte-rss-subfeeds --db-path /var/lib/arte-rss-subfeeds/arte.db --listen 127.0.0.1:8080 --log-level info
 Restart=on-failure
 RestartSec=5
 
