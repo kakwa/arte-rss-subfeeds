@@ -3,36 +3,50 @@ package main
 import (
 	"context"
 	"database/sql"
+	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 const feedURLTemplate = "https://www.arte.tv/partnerFeeds/rss/schedule/today/%s.rss"
 
 func main() {
-	dbPath := getEnv("DB_PATH", "arte.db")
-	addr := getEnv("LISTEN_ADDR", ":8080")
-	interval := getEnvDuration("FETCH_INTERVAL", 4*time.Hour)
+	dbPath := flag.String("db-path", getEnv("DB_PATH", "arte.db"), "path to the sqlite database file")
+	port := flag.Int("port", getEnvInt("PORT", 8080), "port to listen on")
+	logLevel := flag.String("log-level", getEnv("LOG_LEVEL", "info"), "log level: debug, info, warn, error")
+	flag.Parse()
+
+	logger, err := newLogger(*logLevel)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "logger: %v\n", err)
+		os.Exit(1)
+	}
+	defer logger.Sync()
+
+	addr := fmt.Sprintf(":%d", *port)
+	interval := getEnvDuration(logger, "FETCH_INTERVAL", 4*time.Hour)
 	feedURLs := map[string]string{
 		"fr": getEnv("FR_FEED_URL", fmt.Sprintf(feedURLTemplate, "fr")),
 		"de": getEnv("DE_FEED_URL", fmt.Sprintf(feedURLTemplate, "de")),
 	}
 
-	db, err := openDB(dbPath)
+	db, err := openDB(*dbPath)
 	if err != nil {
-		log.Fatalf("open db: %v", err)
+		logger.Fatal("open db", zap.Error(err))
 	}
 	defer db.Close()
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	go runFetchLoop(ctx, db, feedURLs, interval)
+	go runFetchLoop(ctx, logger, db, feedURLs, interval)
 
 	mux := http.NewServeMux()
 	registerFeedRoutes(mux, db)
@@ -45,14 +59,27 @@ func main() {
 		srv.Shutdown(shutdownCtx)
 	}()
 
-	log.Printf("listening on %s", addr)
+	logger.Info("listening", zap.String("addr", addr))
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("server: %v", err)
+		logger.Fatal("server", zap.Error(err))
 	}
 }
 
-func runFetchLoop(ctx context.Context, db *sql.DB, feedURLs map[string]string, interval time.Duration) {
-	fetchAll(db, feedURLs)
+func newLogger(levelStr string) (*zap.Logger, error) {
+	var level zapcore.Level
+	if err := level.UnmarshalText([]byte(levelStr)); err != nil {
+		return nil, fmt.Errorf("invalid log level %q: %w", levelStr, err)
+	}
+	cfg := zap.NewProductionConfig()
+	cfg.Level = zap.NewAtomicLevelAt(level)
+	cfg.Encoding = "console"
+	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	cfg.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	return cfg.Build()
+}
+
+func runFetchLoop(ctx context.Context, logger *zap.Logger, db *sql.DB, feedURLs map[string]string, interval time.Duration) {
+	fetchAll(logger, db, feedURLs)
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 	for {
@@ -60,30 +87,30 @@ func runFetchLoop(ctx context.Context, db *sql.DB, feedURLs map[string]string, i
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			fetchAll(db, feedURLs)
+			fetchAll(logger, db, feedURLs)
 		}
 	}
 }
 
-func fetchAll(db *sql.DB, feedURLs map[string]string) {
+func fetchAll(logger *zap.Logger, db *sql.DB, feedURLs map[string]string) {
 	for lang, url := range feedURLs {
-		fetchOnce(db, url, lang)
+		fetchOnce(logger, db, url, lang)
 	}
 }
 
-func fetchOnce(db *sql.DB, feedURL, lang string) {
-	log.Printf("fetching %s (%s)", feedURL, lang)
+func fetchOnce(logger *zap.Logger, db *sql.DB, feedURL, lang string) {
+	logger.Info("fetching", zap.String("url", feedURL), zap.String("lang", lang))
 	items, err := fetchFeed(feedURL, lang)
 	if err != nil {
-		log.Printf("fetch error (%s): %v", lang, err)
+		logger.Error("fetch error", zap.String("lang", lang), zap.Error(err))
 		return
 	}
 	n, err := storeItems(db, items)
 	if err != nil {
-		log.Printf("store error (%s): %v", lang, err)
+		logger.Error("store error", zap.String("lang", lang), zap.Error(err))
 		return
 	}
-	log.Printf("stored/updated %d entries (%s)", n, lang)
+	logger.Info("stored/updated entries", zap.Int("count", n), zap.String("lang", lang))
 }
 
 func getEnv(key, fallback string) string {
@@ -93,12 +120,22 @@ func getEnv(key, fallback string) string {
 	return fallback
 }
 
-func getEnvDuration(key string, fallback time.Duration) time.Duration {
+func getEnvInt(key string, fallback int) int {
+	if v := os.Getenv(key); v != "" {
+		var i int
+		if _, err := fmt.Sscanf(v, "%d", &i); err == nil {
+			return i
+		}
+	}
+	return fallback
+}
+
+func getEnvDuration(logger *zap.Logger, key string, fallback time.Duration) time.Duration {
 	if v := os.Getenv(key); v != "" {
 		if d, err := time.ParseDuration(v); err == nil {
 			return d
 		}
-		log.Printf("invalid %s=%q, using default %s", key, v, fallback)
+		logger.Warn("invalid duration, using default", zap.String("key", key), zap.String("value", v), zap.Duration("default", fallback))
 	}
 	return fallback
 }

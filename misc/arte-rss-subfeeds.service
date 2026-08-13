@@ -1,0 +1,23 @@
+[Unit]
+Description=Arte RSS subfeeds proxy
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=arte-rss-subfeeds
+Group=arte-rss-subfeeds
+WorkingDirectory=/var/lib/arte-rss-subfeeds
+ExecStart=/usr/local/bin/arte-rss-subfeeds --db-path /var/lib/arte-rss-subfeeds/arte.db --port 8080 --log-level info
+Restart=on-failure
+RestartSec=5
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/arte-rss-subfeeds
+
+[Install]
+WantedBy=multi-user.target
