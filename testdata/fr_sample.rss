@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>ARTE Programme TV</title>
+    <link>https://www.arte.tv/fr/guide/</link>
+    <description>ARTE Emission, série, film, documentaire</description>
+    <language>fr</language>
+    <copyright>Copyright by Arte</copyright>
+    <pubDate>Thu, 13 Aug 2026 12:07:41 +0200</pubDate>
+    <lastBuildDate>Thu, 13 Aug 2026 11:26:52 +0200</lastBuildDate>
+    <docs>http://www.rssboard.org/rss-specification</docs>
+    <ttl>60</ttl>
+    <image>
+      <url>https://static-cdn.arte.tv/static-epgapi/arte_logo_rgb_144.jpg</url>
+      <link>https://www.arte.tv/fr/guide/</link>
+      <title>ARTE Programme TV</title>
+      <width>144</width>
+      <height>144</height>
+    </image>
+  
+<item>
+  <title>ARTE Regards - Urbex en Roumanie, sauver les vestiges - 13. août 2026 à 05:00</title>
+  <link>https://www.arte.tv/fr/videos/120877-006-A/arte-regards/</link>
+  <description><![CDATA[Reportage (Allemagne, 2025, 31mn)<br/>Cinémas fantômes, villes d’eaux dont la splendeur n’est plus qu’un lointain souvenir, villages dépeuplés : le photographe Alex Iacob explore les lieux abandonnés de Roumanie. Avec son appareil photo, il lutte contre l’oubli et documente ce qui reste d’un passé à jamais révolu.]]></description>
+  <category>Info et société</category>
+  <category>Enquêtes et reportages</category>
+  <guid isPermalink="false">5137193_120877-006-A</guid>
+  <pubDate>Thu, 13 Aug 2026 05:00:00 +0200</pubDate>
+</item>
+<item>
+  <title>Aviatrices du bout du monde - Destination Norvège - 13. août 2026 à 05:35</title>
+  <link>https://www.arte.tv/fr/videos/090605-006-A/aviatrices-du-bout-du-monde/</link>
+  <description><![CDATA[Série documentaire (Allemagne, 2022, 26mn)<br/>Pour Jenny Holmenes, installée à Arendal, sur la côte méridionale de la Norvège, le ciel est un terrain de jeu. Cette année, pour la première fois, elle participera au championnat national de voltige aérienne, et fera donc partie des seules deux femmes sélectionnées pour cette compétition.]]></description>
+  <category>Voyages et découvertes</category>
+  <category>Evasion</category>
+  <guid isPermalink="false">5242981_090605-006-A</guid>
+  <pubDate>Thu, 13 Aug 2026 05:35:00 +0200</pubDate>
+</item>
+<item>
+  <title>Invitation au voyage - Théodore Rousseau à Fontainebleau / New York / Amsterdam - 13. août 2026 à 08:20</title>
+  <link>https://www.arte.tv/fr/videos/120086-111-A/invitation-au-voyage/</link>
+  <description><![CDATA[Magazine (2025, 46mn)<br/>Linda Lorin nous emmène à la découverte de notre patrimoine artistique, culturel et naturel. La forêt de Fontainebleau, refuge pictural de Théodore Rousseau - Les frères Piccirilli, tailleurs de la démesure de New York - Au Brésil, le canard au jus de manioc de José - À Amsterdam, le marathonien oublié.]]></description>
+  <category>Culture et pop</category>
+  <category>Arts</category>
+  <guid isPermalink="false">5137197_120086-111-A</guid>
+  <pubDate>Thu, 13 Aug 2026 08:20:00 +0200</pubDate>
+</item>
+<item>
+  <title>Les cent ans de la Route 66 - Un road trip de légende - 13. août 2026 à 09:55</title>
+  <link>https://www.arte.tv/fr/videos/122158-000-A/les-cent-ans-de-la-route-66/</link>
+  <description><![CDATA[Documentaire de Tom Noga (Allemagne, 2026, 1h31mn)<br/>Le long de la route 66, au fil de rencontres hautes en couleur, un voyage dans le temps qui traverse cent ans d’histoire d’un mythe de la culture américaine.]]></description>
+  <category>Histoire</category>
+  <category>XXe siècle</category>
+  <guid isPermalink="false">5137199_122158-000-A</guid>
+  <pubDate>Thu, 13 Aug 2026 09:55:00 +0200</pubDate>
+</item>
+<item>
+  <title>Fraudes et mensonges scientifiques - 13. août 2026 à 11:25</title>
+  <link>https://www.arte.tv/fr/videos/124442-000-A/fraudes-et-mensonges-scientifiques/</link>
+  <description><![CDATA[Documentaire de Moritz Hoppe (Allemagne, 2026, 53mn)<br/>Le monde de la science, loin d’être infaillible, est régulièrement éclaboussé par des scandales liés à des mystificateurs. Cette enquête met en lumière les failles du système et s’interroge sur l’efficacité de ses mécanismes de protection.]]></description>
+  <category>Sciences</category>
+  <category>Médecine et santé</category>
+  <guid isPermalink="false">5233468_124442-000-A</guid>
+  <pubDate>Thu, 13 Aug 2026 11:25:00 +0200</pubDate>
+</item>
+<item>
+  <title>Meurtres à Sandhamn - Saison 8 (1/3) - Enquête 14 - Angelica - 13. août 2026 à 13:35</title>
+  <link>https://www.arte.tv/fr/videos/110221-000-A/meurtres-a-sandhamn-saison-8-1-3/</link>
+  <description><![CDATA[Téléfilm de Mattias Ohlsson (Suède, 2022, 1h29mn)<br/>Dans le cadre enchanteur de l’île de Sandhamn, la procureure Nora Linde reprend du service avec son équipier Alexander, dans une série inspirée des best-sellers de la reine du polar suédois, Viveca Sten. ]]></description>
+  <category>Séries et fictions</category>
+  <category>Séries</category>
+  <guid isPermalink="false">5137204_110221-000-A</guid>
+  <pubDate>Thu, 13 Aug 2026 13:35:00 +0200</pubDate>
+</item>
+</channel>
+</rss>
