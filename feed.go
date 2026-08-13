@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"encoding/xml"
-	"fmt"
 	"net/http"
 	"time"
 )
@@ -48,28 +47,16 @@ func registerFeedRoutes(mux *http.ServeMux, db *sql.DB) {
 	for lang := range supportedLanguages {
 		for _, cat := range allCategories(lang) {
 			lang, cat := lang, cat
-			mux.HandleFunc("/feeds/"+lang+"/"+slugify(cat)+".rss", func(w http.ResponseWriter, r *http.Request) {
+			slug := slugify(cat)
+			mux.HandleFunc("/feeds/"+lang+"/"+slug+".xml", func(w http.ResponseWriter, r *http.Request) {
 				serveCategoryFeed(w, db, lang, cat)
+			})
+			mux.HandleFunc("/api/entries/"+lang+"/"+slug, func(w http.ResponseWriter, r *http.Request) {
+				serveCategoryPreview(w, db, lang, cat)
 			})
 		}
 	}
 	mux.HandleFunc("/", serveIndex)
-}
-
-func serveIndex(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
-	}
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, "<h1>ARTE category feeds</h1>")
-	for _, lang := range []string{"fr", "de"} {
-		fmt.Fprintf(w, "<h2>%s</h2><ul>", lang)
-		for _, cat := range allCategories(lang) {
-			fmt.Fprintf(w, `<li><a href="/feeds/%s/%s.rss">%s</a></li>`, lang, slugify(cat), cat)
-		}
-		fmt.Fprint(w, "</ul>")
-	}
 }
 
 func serveCategoryFeed(w http.ResponseWriter, db *sql.DB, lang, category string) {

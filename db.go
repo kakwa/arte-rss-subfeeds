@@ -98,7 +98,28 @@ func entriesByCategory(db *sql.DB, lang, category string, limit int) ([]entry, e
 		return nil, err
 	}
 	defer rows.Close()
+	return scanEntries(rows, lang)
+}
 
+// entriesByCategorySince is like entriesByCategory but excludes entries
+// published before since, used for the homepage preview so it only ever
+// shows recent programmes.
+func entriesByCategorySince(db *sql.DB, lang, category string, since time.Time, limit int) ([]entry, error) {
+	rows, err := db.Query(`
+		SELECT guid, title, link, description, raw_category, category, pub_date
+		FROM entries
+		WHERE language = ? AND category = ? AND pub_date >= ?
+		ORDER BY pub_date DESC
+		LIMIT ?
+	`, lang, category, since.UTC(), limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	return scanEntries(rows, lang)
+}
+
+func scanEntries(rows *sql.Rows, lang string) ([]entry, error) {
 	var out []entry
 	for rows.Next() {
 		var e entry

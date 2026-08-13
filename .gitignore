@@ -32,3 +32,4 @@ go.work.sum
 # .vscode/
 arte-rss-subfeeds
 arte.db
+arte.db-shm/arte.db-wal

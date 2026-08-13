@@ -17,6 +17,10 @@ import (
 
 const feedURLTemplate = "https://www.arte.tv/partnerFeeds/rss/schedule/today/%s.rss"
 
+// fetchStagger spaces out consecutive per-language feed fetches so we don't
+// hit ARTE's servers with simultaneous requests.
+const fetchStagger = 30 * time.Second
+
 func main() {
 	dbPath := flag.String("db-path", getEnv("DB_PATH", "arte.db"), "path to the sqlite database file")
 	listen := flag.String("listen", getEnv("LISTEN", "127.0.0.1:8080"), "address to listen on, e.g. 127.0.0.1:8080")
@@ -46,7 +50,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	go runFetchLoop(ctx, logger, db, feedURLs, interval)
+	go runFetchLoop(ctx, logger, db, feedURLs, interval, fetchStagger)
 
 	mux := http.NewServeMux()
 	registerFeedRoutes(mux, db)
@@ -78,8 +82,8 @@ func newLogger(levelStr string) (*zap.Logger, error) {
 	return cfg.Build()
 }
 
-func runFetchLoop(ctx context.Context, logger *zap.Logger, db *sql.DB, feedURLs map[string]string, interval time.Duration) {
-	fetchAll(logger, db, feedURLs)
+func runFetchLoop(ctx context.Context, logger *zap.Logger, db *sql.DB, feedURLs map[string]string, interval, stagger time.Duration) {
+	fetchAll(ctx, logger, db, feedURLs, stagger)
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 	for {
@@ -87,13 +91,24 @@ func runFetchLoop(ctx context.Context, logger *zap.Logger, db *sql.DB, feedURLs 
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			fetchAll(logger, db, feedURLs)
+			fetchAll(ctx, logger, db, feedURLs, stagger)
 		}
 	}
 }
 
-func fetchAll(logger *zap.Logger, db *sql.DB, feedURLs map[string]string) {
+// fetchAll fetches every language's feed, pausing stagger between each
+// query rather than firing them all at once.
+func fetchAll(ctx context.Context, logger *zap.Logger, db *sql.DB, feedURLs map[string]string, stagger time.Duration) {
+	first := true
 	for lang, url := range feedURLs {
+		if !first {
+			select {
+			case <-ctx.Done():
+				return
+			case <-time.After(stagger):
+			}
+		}
+		first = false
 		fetchOnce(logger, db, url, lang)
 	}
 }
