@@ -10,11 +10,21 @@ func TestMapCategory(t *testing.T) {
 	}{
 		{"fr", "Sciences", "Sciences"},
 		{"fr", "Voyages et découvertes", "Voyages et découvertes"},
-		{"fr", "Séries et fictions", uncategorized},
+		{"fr", "Séries et fictions", "Séries"},
+		{"fr", "Enquêtes et reportages", "Documentaires et reportages"},
+		{"fr", "Evasion", "Voyages et découvertes"},
+		{"fr", "Médecine et santé", "Sciences"},
+		{"fr", "Arts", "Culture et pop"},
+		{"fr", "XXe siècle", "Histoire"},
 		{"fr", "", uncategorized},
 		{"de", "Wissenschaft", "Wissenschaft"},
 		{"de", "Entdeckung der Welt", "Entdeckung der Welt"},
-		{"de", "Fernsehfilme und Serien", uncategorized},
+		{"de", "Fernsehfilme und Serien", "Serien"},
+		{"de", "Aktuelles", "Aktuelles und Gesellschaft"},
+		{"de", "Das 20. Jahrhundert", "Geschichte"},
+		{"de", "Gesundheit und Medizin", "Wissenschaft"},
+		{"de", "Kunst", "Kultur und Pop"},
+		{"de", "Reisen", "Entdeckung der Welt"},
 		{"de", "Sciences", uncategorized}, // fr category name is not valid for de
 	}
 	for _, c := range cases {

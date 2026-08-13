@@ -9,8 +9,8 @@ import (
 // The testdata/*_sample.rss fixtures are trimmed extracts of the real
 // https://www.arte.tv/partnerFeeds/rss/schedule/today/{fr,de}.rss feeds,
 // picked to cover one item per known category plus one item whose first
-// <category> ("Séries et fictions" / "Fernsehfilme und Serien") does not
-// exactly match any known category, to exercise the "Divers" fallback.
+// <category> ("Séries et fictions" / "Fernsehfilme und Serien") is an
+// alias resolved via categoryAliases rather than an exact match.
 
 func TestParseFeedFR(t *testing.T) {
 	body, err := os.ReadFile("testdata/fr_sample.rss")
@@ -32,7 +32,7 @@ func TestParseFeedFR(t *testing.T) {
 		"5137197_120086-111-A": "Culture et pop",
 		"5137199_122158-000-A": "Histoire",
 		"5233468_124442-000-A": "Sciences",
-		"5137204_110221-000-A": "Divers", // raw category "Séries et fictions" has no exact match
+		"5137204_110221-000-A": "Séries", // raw category "Séries et fictions" aliases to "Séries"
 	}
 
 	for _, e := range entries {
@@ -79,7 +79,7 @@ func TestParseFeedDE(t *testing.T) {
 	want := map[string]string{
 		"5242977_090605-006-A": "Entdeckung der Welt",
 		"5137012_120086-111-A": "Kultur und Pop",
-		"5137021_110221-000-A": "Divers", // raw category "Fernsehfilme und Serien" has no exact match
+		"5137021_110221-000-A": "Serien", // raw category "Fernsehfilme und Serien" aliases to "Serien"
 		"5137026_129043-162-A": "Aktuelles und Gesellschaft",
 		"5137028_122158-000-A": "Geschichte",
 		"5233467_124442-000-A": "Wissenschaft",

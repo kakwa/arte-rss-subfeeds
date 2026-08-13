@@ -31,6 +31,28 @@ var knownCategories = map[string][]string{
 
 const uncategorized = "Divers"
 
+// categoryAliases maps alternate labels ARTE uses for the same category
+// (e.g. a longer or shorter variant) to the canonical name in
+// knownCategories, so they don't fall through to "Divers".
+var categoryAliases = map[string]map[string]string{
+	"fr": {
+		"Séries et fictions":     "Séries",
+		"Enquêtes et reportages": "Documentaires et reportages",
+		"Evasion":                "Voyages et découvertes",
+		"Médecine et santé":      "Sciences",
+		"Arts":                   "Culture et pop",
+		"XXe siècle":             "Histoire",
+	},
+	"de": {
+		"Fernsehfilme und Serien": "Serien",
+		"Aktuelles":               "Aktuelles und Gesellschaft",
+		"Das 20. Jahrhundert":     "Geschichte",
+		"Gesundheit und Medizin":  "Wissenschaft",
+		"Kunst":                   "Kultur und Pop",
+		"Reisen":                  "Entdeckung der Welt",
+	},
+}
+
 var categorySets = func() map[string]map[string]bool {
 	sets := make(map[string]map[string]bool, len(knownCategories))
 	for lang, cats := range knownCategories {
@@ -58,6 +80,9 @@ func allCategories(lang string) []string {
 func mapCategory(lang, raw string) string {
 	if categorySets[lang][raw] {
 		return raw
+	}
+	if canonical, ok := categoryAliases[lang][raw]; ok {
+		return canonical
 	}
 	return uncategorized
 }
